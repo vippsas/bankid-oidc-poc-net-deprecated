@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Test BankID Authentication</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse">
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        @if (!Request.IsAuthenticated)
+        {
+            <div>
+                @using (Html.BeginForm("SetUiLocales", "Home", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+                {
+                    <h4>ui_locales</h4>
+                    <h5>benyttes til å velge språk i BankID-dialogene. Foreløpig er det bare tre valg: 'nb', 'en' og tomt (oppsett fra nettleser).<br />
+                    </h5>
+                    @Html.Label("ui_locales", "ui_locales (Eksempel: 'nb', 'en' eller ingen tekst): ")
+                    @Html.TextBox("ui_locales", Session["ui_locales"] ?? string.Empty);
+                    <input type="submit" value="Set ui_locales" />
+                }
+                <br />
+            </div>
+            <div>
+                @using (Html.BeginForm("SetLoginHint", "Home", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+                {
+                    <h4>login_hint</h4>
+                    <h5>
+                        benyttes til å forhåndsutfylle hvilken BankID som skal benyttes og mulig mobilnummer/fødselsdato eller fødselsnummer som skal benyttes i autentiseringen.<br />
+                        Dersom login_hint er blank (tom tekst) vil du få valg av BankID før autentisering starter.<br />
+                        BID - står for Banklagret BankID <br />
+                        BIM - står for BankID på mobil.
+                    </h5>
+                    @Html.Label("Oppgi eventuelt login_hint", "login_hint (Eksempel: 'BIM:48037464:310842', 'BID:09038000010' eller bare 'BID'): ")
+                    @Html.TextBox("login_hint", Session["login_hint"] ?? string.Empty)
+                    <input type="submit" value="Set login_hint" />
+                }
+                <br />
+            </div>
+        }
+        <footer>
+            <p>Tester BankID OpenID Connect Server: <a href='@Startup.manifestUrl'>@Startup.manifestUrl</a></p>
+            <p>Ønskede scope: @Startup.scope</p>
+            @if (Request.IsAuthenticated)
+            {
+                <p>Godkjente scope: @ViewBag.allowed_scopes</p>
+            }
+          </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
